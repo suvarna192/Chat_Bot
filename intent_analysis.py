@@ -1,10 +1,4 @@
-"""intent_analysis.ipynb
-Author:Rutuja Papade
-Date:21-02-2024
-Original file is located at
-    https://colab.research.google.com/drive/1lLXPUPpVDGyJjXHNg_S-JIs4_U9W_ajp
-Used: analyse the intent and find the token from it
-"""
+
 import re
 
 from span_marker import SpanMarkerModel
