@@ -1,10 +1,3 @@
-"""triggered_next_question.ipynb
-Author:Rutuja Papade
-Date:21-02-2024
-Original file is located at
-    https://colab.research.google.com/drive/1lLXPUPpVDGyJjXHNg_S-JIs4_U9W_ajp
-Used: triggered_next_question
-"""
 from intent_analysis import question_ans_analysis
 import pandas as pd
 
