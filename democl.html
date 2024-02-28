@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: white; /* Light grey background */
+        }
+
+        .chat-header-text {
+            flex-grow: 1; /* Allow the text to take up remaining space */
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Center vertically */
+        }
+
+        .header-text {
+            font-size: 14px; /* Adjust font size */
+            margin-left: 80px; /* Adjust spacing from the logo */
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px; /* Adjusted width */
+            max-height: 500px; /* Adjusted maximum height */
+            border: 1px solid rgb(36, 32, 32);
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+            box-shadow: 0px 0px 20px rgba(10, 9, 9, 0.2);
+        }
+
+        .chat-header {
+            background-color: rgb(26, 20, 20);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgb(12, 11, 11); /* Darker border */
+            border-radius: 10px 10px 0 0;
+            position: relative; /* Required for absolute positioning */
+        }
+
+        .chat-close, .refresh-button {
+            position: absolute;
+            top: 10px;
+            cursor: pointer;
+            font-size: 30px;
+            color: white;
+        }
+
+        .chat-close {
+            right: 20px; /* Adjusted position */
+        }
+
+        .refresh-button {
+            right: 50px; /* Adjusted position */
+        }
+
+        .chat-messages {
+            padding: 15px;
+            background-color: #fff;
+            height: 300px;
+            overflow-y: scroll;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .message-bot, .message-user {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            clear: both;
+        }
+
+        .message-bot {
+            float: left;
+            background-color: #6391e7;
+            color: white;
+        }
+
+        .message-user {
+            float: right;
+            background-color: #59a55d;
+            color: white;
+        }
+
+        .message-text {
+            margin-bottom: 5px; /* Adjusted margin */
+        }
+
+        .timestamp {
+            float: right;
+            font-size: 12px; /* Adjusted font size */
+            color: rgb(2, 2, 2); /* Grey timestamp color */
+        }
+
+        .chat-input-container {
+            position: relative; /* Position relative for absolute positioning */
+            margin-top: 30px; /* Add margin to separate from messages */
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Space between items */
+            padding: 20px 20px;
+            background-color: #fff;
+            border-radius: 25px; /* Increase border-radius */
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            border-color: black;
+        }
+
+        
+
+
+        #fileUpload {
+            display: none;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            margin-left: 10px;
+            padding: 8px 15px; /* Adjust padding */
+            font-size: 16px;
+            border-radius: 25px; /* Increase border-radius */
+            background-color: #f9f9f9;
+            border: 2px solid black;
+        }
+
+        .chat-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scaleY(0.8);
+            }
+
+            50% {
+                transform: scaleY(1.2);
+            }
+
+            100% {
+                transform: scaleY(0.8);
+            }
+        }
+
+        .wave-animation {
+            animation: wave 0.5s ease-in-out;
+        }
+        .thumbnail {
+            cursor: pointer;
+            max-width: 150px; /* Adjust thumbnail size */
+            max-height: 150px; /* Adjust thumbnail size */
+        }
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            overflow: hidden;
+        }
+        .refresh-button {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: rgb(14, 13, 13); /* Blue background */
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            outline: none;
+            border: none;
+            top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating chat button -->
+    <button class="chat-button" onclick="toggleChat()">💬</button>
+    
+
+    <!-- Chat container -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <img src="https://www.sumasoft.com/wp-content/uploads/2023/09/sumasoft-logo.svg" class="logo" alt="Logo">
+            <span class="chat-bot-title">Chat Bot</span>
+            <!-- Refresh button -->
+            <button class="refresh-button" onclick="refreshPage()">↻</button>
+            <span class="chat-close" onclick="toggleChat()">×</span>
+            <div class="chat-header-text">
+                <span class="header-text">How can I help you today?</span>
+            </div>
+        </div>
+        <div class="chat-messages" id="messages"></div>
+        <div class="chat-input-container">
+            <!-- Upload button -->
+            <button class="upload-button" onclick="document.getElementById('fileUpload').click()">📤</button>
+            <!-- File input -->
+            <input type="file" id="fileUpload" style="display: none;" onchange="uploadFile(this.files[0])">
+            <!-- Chat input -->
+            <input type="text" id="inputMessage" class="chat-input" placeholder="Type your message...">
+        </div>
+    </div>
+
+   
+
+    <script>
+        function updateMessages(message, isBot, isFile, fileType, fileName) {
+    var messagesDiv = document.getElementById("messages");
+    var messageDiv = document.createElement("div");
+    messageDiv.className = "message";
+    var messageTextDiv = document.createElement("div");
+    messageTextDiv.className = "message-text";
+    var timestampContainer = document.createElement("div");
+    timestampContainer.className = "timestamp";
+    var timestamp = getCurrentISTTime(); // Get current time in IST
+    timestampContainer.innerText = timestamp;
+
+    if (isBot) {
+        messageDiv.classList.add("message-bot");
+    } else {
+        messageDiv.classList.add("message-user");
+    }
+
+    if (isFile) {
+        if (fileType.startsWith('image')) {
+            // Display image thumbnail
+            var img = document.createElement('img');
+            img.src = message;
+            img.classList.add('thumbnail'); // Add thumbnail class
+            img.addEventListener('click', function() {
+                // Replace thumbnail with full-size image on click
+                img.style.display = 'none'; // Hide thumbnail
+                var fullImg = document.createElement('img');
+                fullImg.src = message;
+                messageTextDiv.appendChild(fullImg); // Append full-size image
+            });
+            messageTextDiv.appendChild(img);
+        } else {
+            // Display file name with download link
+            var fileLink = document.createElement("a");
+            fileLink.href = message;
+            fileLink.download = fileName; // Use the provided filename for download
+            fileLink.textContent = "Download " + fileName;
+            messageTextDiv.appendChild(fileLink);
+        }
+    } else {
+        messageTextDiv.innerText = message;
+    }
+
+    messageDiv.appendChild(messageTextDiv);
+    messageDiv.appendChild(timestampContainer);
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+    // Add animation effect
+    if (isBot) {
+        messageDiv.classList.add("wave-animation");
+    }
+}
+function refreshPage() {
+    var messagesDiv = document.getElementById("messages");
+    messagesDiv.innerHTML = ""; // Clear chat messages
+
+    // Close WebSocket connection
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close(); // Close WebSocket connection if open
+    }
+
+    // Reinitialize WebSocket connection and display initial message
+    initWebSocket();
+}
+
+function viewFile(fileUrl, fileType) {
+    // For simplicity, let's assume we're dealing with images and PDFs only
+    if (fileType.startsWith('image')) {
+        // Display image directly within the chat interface
+        var img = document.createElement('img');
+        img.src = fileUrl;
+        // You might want to open the image in a modal or lightbox for a better user experience
+        // For simplicity, we're just appending the image to the chat messages
+        document.getElementById('messages').appendChild(img);
+    } else if (fileType === 'application/pdf') {
+        // Use PDF.js or another library to render the PDF within the chat interface
+        // Example:
+        var embed = document.createElement('embed');
+        embed.src = fileUrl;
+        embed.type = 'application/pdf';
+        // You may need to adjust the dimensions and styling for proper display
+        embed.style.width = '100%';
+        embed.style.height = '500px';
+        document.getElementById('messages').appendChild(embed);
+    } else {
+        // Handle other file types here
+        alert('Unsupported file type: ' + fileType);
+    }
+}
+
+function uploadFile(file) {
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var data = event.target.result;
+                    // Determine file type
+                    var fileType = getFileType(file.name);
+                    // You can handle different file types differently
+                    // For now, we just display the uploaded file in the chat
+                    updateMessages(data, false, true, fileType, file.name);
+                };
+                reader.readAsDataURL(file); // Read file as data URL
+            }
+        }
+
+
+        function sendFile(file) {
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var data = event.target.result;
+                    // Determine file type
+                    var fileType = getFileType(file.name);
+                    if (fileType.startsWith('image')) {
+                        // Handle images
+                        ws.send({ type: 'image', data: data, name: file.name }); // Send image data and name to WebSocket server
+                    } else {
+                        // Handle other document types
+                        ws.send({ type: 'document', data: data, name: file.name }); // Send document data and name to WebSocket server
+                    }
+                    updateMessages(data, false, true, fileType); // Display file in chat
+                };
+                reader.readAsDataURL(file); // Read file as data URL
+            }
+        }
+
+        // Function to get file type based on file name
+        function getFileType(fileName) {
+            return fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+        }
+function sendMessage() {
+    var inputMessage = document.getElementById("inputMessage").value;
+    if (inputMessage.trim() !== "") {
+        ws.send(inputMessage);
+        updateMessages("" + inputMessage, false); // Print sent message
+        document.getElementById("inputMessage").value = "";
+    }
+}
+
+
+        // Connect to the WebSocket server
+        var ws;
+
+        // Function to initialize WebSocket connection
+        function initWebSocket() {
+            ws = new WebSocket("ws://localhost:7890");
+
+            // Event handler for when the WebSocket connection is opened
+            ws.onopen = function(event) {
+                updateMessages("How can I assist you today?", true);
+            };
+
+            // Event handler for receiving messages from the WebSocket server
+            ws.onmessage = function(event) {
+                updateMessages("" + event.data, true);
+            };
+
+            // Event handler for when an error occurs with the WebSocket connection
+            ws.onerror = function(event) {
+                updateMessages("WebSocket error: " + event, true);
+            };
+
+            // Event handler for when the WebSocket connection is closed
+            ws.onclose = function(event) {
+                //updateMessages("", true);
+            };
+        }
+
+        // Event listener for pressing Enter key
+        document.getElementById("inputMessage").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        // Event listener for closing the chat
+        document.querySelector(".chat-close").addEventListener("click", function() {
+            closeChat(); // Close chat function
+        });
+
+        // Function to toggle the chat container visibility
+        function toggleChat() {
+            var chatContainer = document.getElementById("chatContainer");
+            if (chatContainer.style.display === "none") {
+                chatContainer.style.display = "block";
+                initWebSocket(); // Reinitialize WebSocket connection when chat is opened
+            } else {
+                closeChat(); // Close chat function
+            }
+        }
+        
+
+        // Function to close the chat
+        function closeChat() {
+            var chatContainer = document.getElementById("chatContainer");
+            chatContainer.style.display = "none";
+            document.getElementById("inputMessage").value = ""; // Clear input field
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close(); // Close WebSocket connection if open
+            }
+        }
+
+        // Function to get current time in IST timezone with day of the week
+        function displayCurrentTime() {
+            var currentTimeElement = document.getElementById("currentTime");
+            currentTimeElement.textContent = getCurrentISTTime(); // Set text content to current time
+        }
+
+        function getCurrentISTTime() {
+            var now = new Date();
+            var ISTOffset = 330; // IST offset in minutes
+            var utcTime = now.getTime() + (now.getTimezoneOffset() * 60000); // Convert to UTC time
+            var ISTTime = new Date(utcTime + (ISTOffset * 60000)); // Convert to IST time
+            var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            var dayOfWeek = days[ISTTime.getDay()];
+            var hours = ISTTime.getHours();
+            var minutes = ISTTime.getMinutes();
+            var meridiem = hours >= 12 ? 'PM' : 'AM'; // Determine AM or PM
+            hours = hours % 12;
+            hours = hours ? hours : 12; // Convert midnight (0 hours) to 12
+            var minutesStr = minutes < 10 ? '0' + minutes : minutes; // Add leading zero if needed
+            return dayOfWeek + ' ' + hours + ':' + minutesStr + ' ' + meridiem;
+        }
+
+        // Call the function to display current time initially
+        displayCurrentTime();
+    </script>
+</body>
+</html>
