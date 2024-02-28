@@ -1,11 +1,3 @@
-"""running_bot.ipynb
-Author:Rutuja Papade
-Date:21-02-2024
-Original file is located at
-    https://colab.research.google.com/drive/1lLXPUPpVDGyJjXHNg_S-JIs4_U9W_ajp
-Used: execute the bot flow
-"""
-
 import nltk
 import re
 import random
